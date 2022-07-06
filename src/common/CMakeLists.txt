@@ -134,6 +134,10 @@ target_compile_definitions(meshlab-common
 		MESHLAB_VERSION=${MESHLAB_VERSION}
 		MESHLAB_SCALAR=${MESHLAB_SCALAR})
 
+if(WIN32)
+  target_compile_definitions(meshlab-common PUBLIC WIN32)
+endif()
+
 target_include_directories(meshlab-common
 	PUBLIC
 		${CMAKE_CURRENT_SOURCE_DIR}/..)

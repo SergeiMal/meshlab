@@ -293,6 +293,12 @@ void MeshModel::updateDataMask(int neededDataMask)
 		cm.face.EnableCurvatureDir();
 	if((neededDataMask & MM_FACEMARK)!=0)
 		cm.face.EnableMark();
+#ifdef WEDGNORMAL_MODE
+	if ((neededDataMask & MM_FACENORMAL) != 0)
+		cm.face.EnableNormal();
+	if ((neededDataMask & MM_WEDGNORMAL) != 0)
+		cm.face.EnableWedgeNormal();
+#endif
 	if((neededDataMask & MM_VERTMARK)!=0)
 		cm.vert.EnableMark();
 	if((neededDataMask & MM_VERTCURV)!=0)
@@ -314,6 +320,10 @@ void MeshModel::clearDataMask(int unneededDataMask)
 	if( ( (unneededDataMask & MM_FACEFACETOPO)!=0)	&& hasDataMask(MM_FACEFACETOPO))	cm.face.DisableFFAdjacency();
 
 	if( ( (unneededDataMask & MM_WEDGTEXCOORD)!=0)	&& hasDataMask(MM_WEDGTEXCOORD)) 	cm.face.DisableWedgeTexCoord();
+#ifdef WEDGNORMAL_MODE
+	if (((unneededDataMask & MM_WEDGNORMAL) != 0) && hasDataMask(MM_WEDGNORMAL))	cm.face.DisableWedgeNormal();
+	if (((unneededDataMask & MM_FACENORMAL) != 0) && hasDataMask(MM_FACENORMAL))	cm.face.DisableNormal();
+#endif
 	if( ( (unneededDataMask & MM_FACECOLOR)!=0)			&& hasDataMask(MM_FACECOLOR))			cm.face.DisableColor();
 	if( ( (unneededDataMask & MM_FACEQUALITY)!=0)		&& hasDataMask(MM_FACEQUALITY))		cm.face.DisableQuality();
 	if( ( (unneededDataMask & MM_FACEMARK)!=0)			&& hasDataMask(MM_FACEMARK))			cm.face.DisableMark();
@@ -321,7 +331,7 @@ void MeshModel::clearDataMask(int unneededDataMask)
 	if( ( (unneededDataMask & MM_VERTCURV)!=0)			&& hasDataMask(MM_VERTCURV))			cm.vert.DisableCurvature();
 	if( ( (unneededDataMask & MM_VERTCURVDIR)!=0)		&& hasDataMask(MM_VERTCURVDIR))		cm.vert.DisableCurvatureDir();
 	if( ( (unneededDataMask & MM_VERTRADIUS)!=0)		&& hasDataMask(MM_VERTRADIUS))		cm.vert.DisableRadius();
-	if( ( (unneededDataMask & MM_VERTTEXCOORD)!=0)	&& hasDataMask(MM_VERTTEXCOORD))	cm.vert.DisableTexCoord();
+	if( ( (unneededDataMask & MM_VERTTEXCOORD)!=0)  && hasDataMask(MM_VERTTEXCOORD))	cm.vert.DisableTexCoord();
 
 	currentDataMask = currentDataMask & (~unneededDataMask);
 }
@@ -332,6 +342,12 @@ void MeshModel::enable(int openingFileMask)
 		updateDataMask(MM_VERTTEXCOORD);
 	if( openingFileMask & tri::io::Mask::IOM_WEDGTEXCOORD )
 		updateDataMask(MM_WEDGTEXCOORD);
+#ifdef WEDGNORMAL_MODE
+	if (openingFileMask & tri::io::Mask::IOM_WEDGNORMAL)
+		updateDataMask(MM_WEDGNORMAL);
+	if (openingFileMask & tri::io::Mask::IOM_FACENORMAL)
+		updateDataMask(MM_FACENORMAL);
+#endif
 	if( openingFileMask & tri::io::Mask::IOM_VERTCOLOR	)
 		updateDataMask(MM_VERTCOLOR);
 	if( openingFileMask & tri::io::Mask::IOM_FACECOLOR	)

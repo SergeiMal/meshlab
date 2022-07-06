@@ -266,6 +266,10 @@ void BaseMeshIOPlugin::open(const QString &formatName, const QString &fileName, 
 
 //		if (oi.mask & tri::io::Mask::IOM_WEDGNORMAL)
 //			normalsUpdated = true;
+		if ((oi.mask & tri::io::Mask::IOM_VERTNORMAL) == 0)
+		{
+			m.clearDataMask(MeshModel::MM_VERTNORMAL);
+		}
 		m.enable(oi.mask);
 		if (m.hasDataMask(MeshModel::MM_POLYGONAL)) qDebug("Mesh is Polygonal!");
 		mask = oi.mask;
