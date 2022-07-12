@@ -77,10 +77,6 @@ add_executable(meshlab WIN32 MACOSX_BUNDLE
 	${SOURCES} ${HEADERS} ${RESOURCES}
 	${UI})
 
-if(WIN32)
-  target_compile_definitions(meshlab PUBLIC -DWIN32)
-endif()
-
 target_compile_definitions(meshlab PUBLIC QT_DISABLE_DEPRECATED_BEFORE=0x000000)
 target_include_directories(meshlab PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(

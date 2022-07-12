@@ -90,7 +90,9 @@ find_package(Eigen3)
 #ENDIF (CMAKE_CONFIGURATION_TYPES)
 
 # Definition of preprocessor macros
-add_definitions(-DWEDGNORMAL_MODE)
+if(WIN32)
+  add_definitions(-DWIN32)
+endif()
 
 message( "MeshLab_BIN_DIRECTORY = ${MeshLab_BIN_DIRECTORY}" )
 message( "CMAKE_CURRENT_BINARY_DIR = ${CMAKE_CURRENT_BINARY_DIR}")
@@ -285,9 +287,6 @@ foreach(PLUGIN ${MESHLAB_PLUGINS})
 		message(STATUS "  - ${PLUGIN} - Skipping, plugin or build system not found.")
 	endif()
 endforeach()
-
-
-add_definitions( WIN32 )
 
 ### Copy/install other files
 
