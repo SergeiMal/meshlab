@@ -15,6 +15,7 @@ project(MeshLab)
 
 ### Build options
 option(BUILD_MINI "Build only a minimal set of plugins" ON)
+option(BUILD_ALL_PLUGINS "Build full set of plugins" OFF)
 option(BUILD_STRICT "Strictly enforce resolution of all symbols" ON)
 option(BUILD_WITH_DOUBLE_SCALAR "Use double type instead of float type for scalars" OFF)
 
@@ -184,16 +185,14 @@ if (NOT BUILD_ONLY_MESHLAB_LIBRARIES)
 	set(CMAKE_INSTALL_RPATH)
 endif()
 
-
-
 ### Plugin subdirectories
 if(NOT DEFINED MESHLAB_PLUGINS) # it may be already defined in parent directory
 	if(BUILD_MINI)
 		set(MESHLAB_PLUGINS
-			meshlabplugins/io_base
-			meshlabplugins/filter_meshing
+#			meshlabplugins/io_base
+#			meshlabplugins/filter_meshing
 #			meshlabplugins/decorate_base
-			meshlabplugins/filter_measure
+#			meshlabplugins/filter_measure
 		)
 	else()
 		set(MESHLAB_PLUGINS
