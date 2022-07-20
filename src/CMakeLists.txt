@@ -3,17 +3,37 @@
 # SPDX-License-Identifier: BSL-1.0
 
 cmake_minimum_required(VERSION 3.10)
+
+cmake_policy(SET CMP0074 NEW)
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} /bigobj)
+
+if(WIN32)
+  message(STATUS "WIN32 detected.!")
+endif()
+
 project(MeshLab)
 
 ### Build options
-option(BUILD_MINI "Build only a minimal set of plugins" OFF)
+option(BUILD_MINI "Build only a minimal set of plugins" ON)
+option(BUILD_ALL_PLUGINS "Build full set of plugins" OFF)
 option(BUILD_STRICT "Strictly enforce resolution of all symbols" ON)
 option(BUILD_WITH_DOUBLE_SCALAR "Use double type instead of float type for scalars" OFF)
 
-option(BUILD_ONLY_MESHLAB_LIBRARIES "Build only meshlab-common and plugins" OFF)
+option(BUILD_ONLY_MESHLAB_LIBRARIES "Build only meshlab-common and plugins" ON)
 option(USE_DEFAULT_BUILD_AND_INSTALL_DIRS "If set to OFF, it expects that you set manually the binary and install directories" ON)
 
 option(MESHLAB_IS_NIGHTLY_VERSION "Nightly version of meshlab will be used instead of ML_VERSION" OFF)
+
+
+IF (POLICY CMP0053)
+    CMAKE_POLICY(SET CMP0053 NEW) # CMake 3.1 introduced a much faster implementation of evaluation of the Variable References and Escape Sequences
+ENDIF ()
+IF (POLICY CMP0068)
+    CMAKE_POLICY(SET CMP0068 NEW) # In CMake 3.9, it only affects setting of RPATH. However, if one wants INSTALL_NAME_DIR to apply to the target in the build tree, one may set BUILD_WITH_INSTALL_NAME_DIR.
+ENDIF ()
+IF (POLICY CMP0087)
+    CMAKE_POLICY(SET CMP0087 NEW) # In CMake 3.13 and earlier, install(CODE) and install(SCRIPT) did not evaluate generator expressions. CMake 3.14 and later will evaluate generator expressions for install(CODE) and install(SCRIPT).
+ENDIF ()
 
 ### Dependencies
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -32,6 +52,51 @@ find_package(OpenMP)
 message(STATUS "Searching for required components with bundled fallback")
 find_package(GLEW)
 find_package(Eigen3)
+
+#IF (NOT SET_UP_CONFIGURATIONS_DONE)
+    SET(SET_UP_CONFIGURATIONS_DONE 1)
+
+    MESSAGE("Begin setup config: SET_UP_CONFIGURATIONS_DONE.")
+
+    # No reason to set CMAKE_CONFIGURATION_TYPES if it's not a multiconfig generator
+    # Also no reason mess with CMAKE_BUILD_TYPE if it's a multiconfig generator.
+    IF (CMAKE_CONFIGURATION_TYPES) # multiconfig generator?
+        SET(CMAKE_CONFIGURATION_TYPES "Debug;RelWithDebInfo;Release" CACHE STRING "" FORCE)
+        SET(CMAKE_CONFIGURATION_TYPES "Debug;RelWithDebInfo;Release" CACHE STRING "" FORCE)
+    ELSE ()
+        IF (NOT CMAKE_BUILD_TYPE)
+            MESSAGE("Defaulting to RelWithDebInfo build.")
+            #SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "" FORCE)
+            SET(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)
+        ENDIF ()
+        SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY HELPSTRING "Choose the type of build")
+        # set the valid options for cmake-gui drop-down list
+        SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug;RelWithDebInfo;Release")
+    ENDIF ()
+    # now set up the Profile configuration
+    SET(CMAKE_C_FLAGS_PROFILE "...")
+    SET(CMAKE_CXX_FLAGS_PROFILE "...")
+    SET(CMAKE_EXE_LINKER_FLAGS_PROFILE "...")
+#ENDIF ()
+
+## Allow Debug and RelWithDebInfo only
+#IF (CMAKE_CONFIGURATION_TYPES)
+    SET(CMAKE_CONFIGURATION_TYPES "Debug;RelWithDebInfo;Release" CACHE STRING "My multi config types" FORCE)
+#ENDIF ()
+
+#IF (CMAKE_CONFIGURATION_TYPES)
+    SET(MeshLab_BIN_DIRECTORY $<$<CONFIG:RelWithDebInfo>:${CMAKE_CURRENT_BINARY_DIR}/bin/RelWithDebInfo>$<$<CONFIG:Release>:${CMAKE_CURRENT_BINARY_DIR}/bin/Release>$<$<CONFIG:Debug>:${CMAKE_CURRENT_BINARY_DIR}/bin/Debug>)
+#ELSE (CMAKE_CONFIGURATION_TYPES)
+#    SET(MeshLab_BIN_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+#ENDIF (CMAKE_CONFIGURATION_TYPES)
+
+# Definition of preprocessor macros
+if(WIN32)
+  add_definitions(-DWIN32)
+endif()
+
+message( "MeshLab_BIN_DIRECTORY = ${MeshLab_BIN_DIRECTORY}" )
+message( "CMAKE_CURRENT_BINARY_DIR = ${CMAKE_CURRENT_BINARY_DIR}")
 
 ### Build directories
 if (USE_DEFAULT_BUILD_AND_INSTALL_DIRS) # otherwise, we assume that all these dirs are defined in parent dir
@@ -120,16 +185,14 @@ if (NOT BUILD_ONLY_MESHLAB_LIBRARIES)
 	set(CMAKE_INSTALL_RPATH)
 endif()
 
-
-
 ### Plugin subdirectories
 if(NOT DEFINED MESHLAB_PLUGINS) # it may be already defined in parent directory
 	if(BUILD_MINI)
 		set(MESHLAB_PLUGINS
-			meshlabplugins/io_base
-			meshlabplugins/filter_meshing
-			meshlabplugins/decorate_base
-			meshlabplugins/filter_measure
+#			meshlabplugins/io_base
+#			meshlabplugins/filter_meshing
+#			meshlabplugins/decorate_base
+#			meshlabplugins/filter_measure
 		)
 	else()
 		set(MESHLAB_PLUGINS
@@ -223,7 +286,6 @@ foreach(PLUGIN ${MESHLAB_PLUGINS})
 		message(STATUS "  - ${PLUGIN} - Skipping, plugin or build system not found.")
 	endif()
 endforeach()
-
 
 ### Copy/install other files
 

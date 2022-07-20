@@ -119,7 +119,13 @@ class CFaceO    : public vcg::Face<  CUsedTypesO,
 		vcg::face::InfoOcf,              /* 4b */
 		vcg::face::VertexRef,            /*12b */
 		vcg::face::BitFlags,             /* 4b */
+
+#ifdef WEDGNORMAL_MODE
+	    vcg::face::WedgeNormal3fOcf,
+	    vcg::face::Normal3fOcf,
+#else
 		vcg::face::Normal3m,             /*12b */
+#endif
 		vcg::face::QualitymOcf,          /* 0b */
 		vcg::face::MarkOcf,              /* 0b */
 		vcg::face::Color4bOcf,           /* 0b */

@@ -88,7 +88,8 @@ std::list<std::string> loadMesh(
 			vcg::tri::UpdateNormal<CMeshO>::PerBitQuadFaceNormalized(mm->cm);
 			vcg::tri::UpdateNormal<CMeshO>::PerVertexFromCurrentFaceNormal(mm->cm);
 		} // standard case
-		else {
+		//else {
+		else if(vcg::tri::HasPerFaceNormal(mm->cm)) {
 			vcg::tri::UpdateNormal<CMeshO>::PerFaceNormalized(mm->cm);
 			if(!( mask & vcg::tri::io::Mask::IOM_VERTNORMAL) )
 				vcg::tri::UpdateNormal<CMeshO>::PerVertexAngleWeighted(mm->cm);
